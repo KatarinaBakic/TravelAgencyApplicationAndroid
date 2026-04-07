@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">TravelAgencyApplication</string>
+    <string name="btnLogin">Prijavi se</string>
+    <string name="etPassword">Lozinka</string>
+    <string name="etUsername">Korisničko ime</string>
+</resources>

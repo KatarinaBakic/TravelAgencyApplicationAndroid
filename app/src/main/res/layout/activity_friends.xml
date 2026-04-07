@@ -1,0 +1,37 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pošalji zahtev za prijateljstvo" android:textStyle="bold" />
+        <Spinner android:id="@+id/spinnerUsers" android:layout_width="match_parent"
+            android:layout_height="48dp" android:layout_marginTop="8dp" />
+        <Button android:id="@+id/btnSendRequest" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Pošalji" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Poslati zahtevi" android:layout_marginTop="20dp" android:textStyle="bold" />
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSentRequests"
+            android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Vaši prijatelji" android:layout_marginTop="20dp" android:textStyle="bold" />
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvActiveFriends"
+            android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Zahtevi na čekanju" android:layout_marginTop="20dp" android:textStyle="bold" />
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvPendingRequests"
+            android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

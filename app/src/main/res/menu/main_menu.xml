@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_home"
+        android:title="Početna"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:title="Profil"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/nav_favorites"
+        android:title="Moji Omiljeni"
+        android:icon="@android:drawable/btn_star_big_on"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/nav_friends"
+        android:title="Prijatelji"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Odjava"
+        app:showAsAction="never" />
+</menu>
