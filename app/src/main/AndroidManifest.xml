@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TravelAgencyApplication"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".AddDestinationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DeletedDestinationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditDestinationActivity"
+            android:exported="false" />
         <activity
             android:name=".ReviewsActivity"
             android:exported="false" />
@@ -37,10 +51,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCXVENrYAY2oX_P88ValwV5qTJl_iuxKzs" />
     </application>
 
 </manifest>

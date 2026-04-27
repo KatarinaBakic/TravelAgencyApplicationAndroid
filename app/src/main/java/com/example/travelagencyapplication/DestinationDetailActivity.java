@@ -34,11 +34,11 @@ public class DestinationDetailActivity extends AppCompatActivity {
     private TextView tvNaslov, tvOpis, tvCena, tvOcena;
     private ImageView ivDetaljiSlika;
     private RatingBar rbDetaljiOcena;
-
     private EditText etNoviKomentar;
-    private Button btnPosaljiKomentar;
+    private Button btnPosaljiKomentar, btnVidiSveRecenzije;
     private RatingBar rbUnosOcene;
     private LinearLayout layoutUnosKomentara;
+    private Double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,21 +46,17 @@ public class DestinationDetailActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_destination_detail);
 
-        // 1. POVEZIVANJE ELEMENATA
-        tvNaslov       = findViewById(R.id.tvDetaljiNaslov);
-        tvOpis         = findViewById(R.id.tvDetaljiOpis);
-        tvCena         = findViewById(R.id.tvDetaljiCena);
-        ivDetaljiSlika = findViewById(R.id.ivDetaljiSlika);
-        rbDetaljiOcena = findViewById(R.id.rbDetaljiOcena);
-
-        etNoviKomentar = findViewById(R.id.etNoviKomentar);
-        btnPosaljiKomentar = findViewById(R.id.btnPosaljiKomentar);
-        rbUnosOcene = findViewById(R.id.rbUnosOcene);
+        tvNaslov            = findViewById(R.id.tvDetaljiNaslov);
+        tvOpis              = findViewById(R.id.tvDetaljiOpis);
+        tvCena              = findViewById(R.id.tvDetaljiCena);
+        ivDetaljiSlika      = findViewById(R.id.ivDetaljiSlika);
+        rbDetaljiOcena      = findViewById(R.id.rbDetaljiOcena);
+        rbUnosOcene         = findViewById(R.id.rbUnosOcene);
+        etNoviKomentar      = findViewById(R.id.etNoviKomentar);
+        btnPosaljiKomentar  = findViewById(R.id.btnPosaljiKomentar);
+        btnVidiSveRecenzije = findViewById(R.id.btnVidiSveRecenzije);
         layoutUnosKomentara = findViewById(R.id.layoutUnosKomentara);
 
-        Button btnVidiSveRecenzije = findViewById(R.id.btnVidiSveRecenzije);
-
-        // 2. PROVERA LOGOVANJA (Odmah odlučujemo da li se vidi polje za komentare)
         if (isUserLoggedIn()) {
             layoutUnosKomentara.setVisibility(View.VISIBLE);
         } else {
@@ -68,13 +64,12 @@ public class DestinationDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Ulogujte se da biste ostavili recenziju", Toast.LENGTH_SHORT).show();
         }
 
-        // 3. PREUZIMANJE PODATAKA IZ ADAPTERA
-        int packageTourId = getIntent().getIntExtra("packageTourId", -1);
+        long packageTourId = getIntent().getLongExtra("packageTourId", -1L);
+        Log.e("packageTourId", String.valueOf(packageTourId));
         if (packageTourId != -1) {
             ucitajDetalje(packageTourId);
         }
 
-        // 4. LISTENERS (Klikovi na dugmiće)
         btnPosaljiKomentar.setOnClickListener(v -> {
             posaljiRecenziju(packageTourId);
         });
@@ -84,7 +79,6 @@ public class DestinationDetailActivity extends AppCompatActivity {
             intent.putExtra("packageTourId", packageTourId); // packageTourId je onaj koji već imaš u aktivnosti
             startActivity(intent);
         });
-
 
         FloatingActionButton fabMap = findViewById(R.id.fabMap);
         fabMap.setOnClickListener(v -> showOnMap());
@@ -97,9 +91,9 @@ public class DestinationDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void ucitajDetalje(int id) {
+    private void ucitajDetalje(long id) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Call<TourPackageDTO> call = apiService.getDetails(id);
+        Call<TourPackageDTO> call = apiService.getDetails((int) id);
 
         call.enqueue(new Callback<TourPackageDTO>() {
             @Override
@@ -115,7 +109,10 @@ public class DestinationDetailActivity extends AppCompatActivity {
                         rbDetaljiOcena.setRating(dto.getAverageRating().floatValue());
                     }
 
-                    String slikaUrl = "http://192.168.1.9:8080" + dto.getImageUrl();
+                    latitude  = dto.getLatitude();
+                    longitude = dto.getLongitude();
+
+                    String slikaUrl = RetrofitClient.SERVER_URL + dto.getImageUrl();
                     Log.e("slikaUrl", slikaUrl);
                     com.bumptech.glide.Glide.with(DestinationDetailActivity.this)
                             .load(slikaUrl)
@@ -131,7 +128,7 @@ public class DestinationDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void posaljiRecenziju(int packageId) {
+    private void posaljiRecenziju(long packageId) {
         SharedPreferences sp = getSharedPreferences("TravelAgencyApplication", MODE_PRIVATE);
         String userIdStr     = sp.getString("userId", "-1");
 
@@ -139,18 +136,16 @@ public class DestinationDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Niste ulogovani!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         long ulogovanKorisnikId = Long.parseLong(userIdStr);
         String tekst            = etNoviKomentar.getText().toString();
         int ocena               = (int) rbUnosOcene.getRating();
-
         if (ocena == 0) {
             Toast.makeText(this, "Molimo Vas izaberite ocenu!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         com.example.travelagencyapplication.model.ReviewDTO reviewDto =
-                new com.example.travelagencyapplication.model.ReviewDTO(tekst, ocena, ulogovanKorisnikId, (long) packageId);
+                new com.example.travelagencyapplication.model.ReviewDTO(tekst, ocena, ulogovanKorisnikId, packageId);
 
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         apiService.postReview(reviewDto).enqueue(new Callback<okhttp3.ResponseBody>() {
@@ -173,25 +168,29 @@ public class DestinationDetailActivity extends AppCompatActivity {
     }
 
     private void showOnMap() {
-        String location = tvNaslov.getText().toString();
-        if (!location.isEmpty()) {
-            Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(location));
+        if (latitude != null && longitude != null) {
+            String label = tvNaslov.getText().toString();
+            Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + latitude + "," + longitude + "(" + Uri.encode(label) + ")");
+
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
+
             if (mapIntent.resolveActivity(getPackageManager()) != null) {
                 startActivity(mapIntent);
+            } else {
+                // Ako korisnik nema instalirane Google Mape, otvori u browseru
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://www.google.com/maps/search/?api=1&query=" + latitude + "," + longitude));
+                startActivity(browserIntent);
             }
+        } else {
+            Toast.makeText(this, "Lokacija za ovaj aranžman nije dostupna", Toast.LENGTH_SHORT).show();
         }
     }
 
     private boolean isUserLoggedIn() {
-        // Gleda isti fajl kao UserPageActivity
         SharedPreferences sp = getSharedPreferences("TravelAgencyApplication", MODE_PRIVATE);
         String userIdStr = sp.getString("userId", "-1");
-
-        Log.d("ProveraLogina", "Vrednost iz memorije: [" + userIdStr + "]");
-
         return userIdStr != null && !userIdStr.equals("-1");
     }
-
 }

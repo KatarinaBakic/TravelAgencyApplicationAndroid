@@ -7,17 +7,18 @@
     android:background="#F8F9FA"
     tools:context=".FavoritesActivity">
 
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarFavorites"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:title="Moji Omiljeni Aranžmani"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Travel Agency"
         app:titleTextColor="@android:color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:layout_constraintTop_toTopOf="parent"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
+        tools:ignore="MissingConstraints" />
     <LinearLayout
         android:id="@+id/filterContainer"
         android:layout_width="match_parent"

@@ -37,8 +37,7 @@ public class ReviewsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rvReviews);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        int packageTourId = getIntent().getIntExtra("packageTourId", -1);
-
+        int packageTourId = (int)getIntent().getLongExtra("packageTourId", -1L);
         if (packageTourId != -1) {
             loadReviews(packageTourId);
         } else {
@@ -53,14 +52,11 @@ public class ReviewsActivity extends AppCompatActivity {
             public void onResponse(Call<List<ReviewDTO>> call, Response<List<ReviewDTO>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<ReviewDTO> reviews = response.body();
-
                     if (reviews.isEmpty()) {
                         Toast.makeText(ReviewsActivity.this, "Nema recenzija za ovaj aranžman", Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
-                        // Ovde postavljaš svoj adapter na RecyclerView
                         adapter = new ReviewAdapter(reviews);
-                        //recyclerView.setLayoutManager(new LinearLayoutManager(this));
                         recyclerView.setAdapter(adapter);
                     }
                 }

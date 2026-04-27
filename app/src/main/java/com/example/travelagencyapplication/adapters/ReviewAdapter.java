@@ -14,9 +14,7 @@ import com.example.travelagencyapplication.model.ReviewDTO;
 import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
-
     private List<ReviewDTO> reviewList;
-
     public ReviewAdapter(List<ReviewDTO> reviewList) {
         this.reviewList = reviewList;
     }
@@ -31,9 +29,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         ReviewDTO review = reviewList.get(position);
-
-        // Postavi podatke u UI elemente
-        // Ako si dodala username u DTO, ovde stavi review.getUsername()
         holder.tvUser.setText("Korisnik ID: " + review.getUserId());
         holder.tvComment.setText(review.getReview());
         holder.rbStars.setRating((float) review.getRating());
@@ -47,12 +42,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
         TextView tvUser, tvComment;
         RatingBar rbStars;
-
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvUser = itemView.findViewById(R.id.tvReviewUser);
+            tvUser    = itemView.findViewById(R.id.tvReviewUser);
             tvComment = itemView.findViewById(R.id.tvReviewComment);
-            rbStars = itemView.findViewById(R.id.rbReviewStars);
+            rbStars   = itemView.findViewById(R.id.rbReviewStars);
         }
     }
 }

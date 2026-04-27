@@ -33,6 +33,18 @@
         android:text="@string/btnLogin"
         android:layout_marginTop="20dp" />
 
+    <TextView
+        android:id="@+id/tvForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zaboravili ste lozinku?"
+        android:textColor="#1976D2"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true" />
+
     <Button
         android:id="@+id/btnGoToDestinations"
         android:layout_width="wrap_content"

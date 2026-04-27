@@ -8,13 +8,19 @@ import com.example.travelagencyapplication.model.TourPackageDTO;
 import com.example.travelagencyapplication.model.User;
 
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -24,7 +30,7 @@ public interface ApiService {
 
     @GET("users/api/tourPackages")
     Call<List<TourPackageDTO>> getTourPackages(
-            @Query("action") String action,
+            @Query("action") String action,   // "active", "deleted"
             @Query("categoryId") Long categoryId
     );
 
@@ -45,8 +51,6 @@ public interface ApiService {
             @Query("userId") Long userId,
             @Query("idCategory") Long categoryId
     );
-
-    //TODO :FRIENDSHIP
 
     @GET("friend/api/pending/sent/{userId}")
     Call<List<Friendship>> getSentRequests(@Path("userId") long userId);
@@ -81,6 +85,14 @@ public interface ApiService {
     @GET("tours/api/availableDestinations")
     Call<List<CategoryDTO>> getAvailableDestinations();
 
+    @FormUrlEncoded
+    @POST("tours/api/deletedDestination")
+    Call<Map<String, Object>> deleteDestination(@Field("destinationId") Long id);
+
+    @FormUrlEncoded
+    @POST("tours/api/restoreDestination")
+    Call<Map<String, Object>> restorePackage(@Field("destinationId") Long id);
+
     @GET("reviews/api/tourpackage/{tourPackageId}")
     Call<List<ReviewDTO>> getReviewsForPackage(@Path("tourPackageId") int id);
 
@@ -91,4 +103,42 @@ public interface ApiService {
             @Query("password") String password,
             @Query("password2") String password2
     );
+
+    @Multipart
+    @POST("tours/api/updateDestination")
+    Call<Map<String, Object>> updateTourPackage(
+            @Part("id") RequestBody id,
+            @Part("title") RequestBody title,
+            @Part("description") RequestBody description,
+            @Part("price") RequestBody price,
+            @Part("categoryId") RequestBody categoryId,
+            @Part("latitude") RequestBody latitude,
+            @Part("longitude") RequestBody longitude,
+            @Part MultipartBody.Part imageFile
+    );
+
+    @Multipart
+    @POST("categories/api/add")
+    Call<TourPackageCategory> addCategory(
+            @Part("name") RequestBody name,
+            @Part("description") RequestBody description,
+            @Part MultipartBody.Part imageCat
+    );
+
+    @Multipart
+    @POST("tours/api/createNew")
+    Call<ResponseBody> addDestination(
+            @Part("title") RequestBody title,
+            @Part("description") RequestBody description,
+            @Part("price") RequestBody price,
+            @Part("categoryId") RequestBody categoryId,
+            @Part("userId") RequestBody userId,
+            @Part("latitude") RequestBody latitude,
+            @Part("longitude") RequestBody longitude,
+            @Part MultipartBody.Part image
+    );
+
+    @FormUrlEncoded
+    @POST("users/api/forgotPassword")
+    Call<Map<String, String>> forgotPassword(@Field("email") String email);
 }

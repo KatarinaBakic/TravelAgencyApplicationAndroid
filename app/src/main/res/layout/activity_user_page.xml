@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -34,7 +33,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -46,7 +45,7 @@
                         android:id="@+id/tvWelcome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dobrodošli, !"
+                        android:text="Dobrodošli!"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         android:textColor="#333333"/>
@@ -57,50 +56,110 @@
                         android:layout_height="wrap_content"
                         android:text=""
                         android:textColor="#333333"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textSize="16sp" />
+
                     <TextView
                         android:id="@+id/tvFirstname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="22sp"
-                        android:textStyle="bold"
+                        android:textSize="16sp"
                         android:textColor="#333333"/>
+
                     <TextView
                         android:id="@+id/tvLastname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:textSize="22sp"
-                        android:textStyle="bold"
+                        android:textSize="16sp"
                         android:textColor="#333333"/>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIzmeniProfil"
+                        android:id="@+id/btnEditProfile"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="12dp"
                         android:text="Izmeni profil"
                         app:icon="@android:drawable/ic_menu_edit"
                         android:textColor="?attr/colorPrimary"
                         app:strokeColor="?attr/colorPrimary" />
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBackToActive"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="Aktivni"
+                        android:visibility="gone"
+                        android:backgroundTint="#4CAF50"
+                        app:icon="@android:drawable/ic_menu_revert"
+                        app:cornerRadius="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDeletedDestinations"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="Obrisani aranžmani"
+                        android:visibility="gone"
+                        android:backgroundTint="#E91E63"
+                        app:icon="@android:drawable/ic_menu_delete"
+                        app:cornerRadius="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fabAddCategory"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="Kategorija+"
+                        android:visibility="gone"
+                        android:backgroundTint="#FF9800"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:cornerRadius="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fabAddDestination"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Destinacija+"
+                        android:visibility="gone"
+                        android:backgroundTint="#4CAF50"
+                        app:icon="@android:drawable/ic_input_add"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Filtriraj po kategoriji:"
-                android:layout_marginTop="8dp"/>
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
 
             <Spinner
                 android:id="@+id/spinnerCategories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:background="@android:drawable/btn_dropdown" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -115,7 +174,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="2"
                 tools:listitem="@layout/item_destination_user_page"/>
 
         </LinearLayout>

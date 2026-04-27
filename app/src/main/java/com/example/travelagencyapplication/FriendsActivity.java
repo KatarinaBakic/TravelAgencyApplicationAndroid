@@ -1,14 +1,18 @@
 package com.example.travelagencyapplication;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -42,29 +46,25 @@ public class FriendsActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_friends);
 
-        // 1. Inicijalizacija API servisa i korisnika
         apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         SharedPreferences sp = getSharedPreferences("TravelAgencyApplication", MODE_PRIVATE);
-        currentUserId = Long.parseLong(sp.getString("userId", "-1"));
 
-        // 2. Povezivanje UI elemenata
+        Toolbar toolbar = findViewById(R.id.toolbarFriends);
+        setSupportActionBar(toolbar);
+
+        currentUserId         = Long.parseLong(sp.getString("userId", "-1"));
         spinnerAvailableUsers = findViewById(R.id.spinnerUsers);
-        rvSent     = findViewById(R.id.rvSentRequests);
-        rvReceived = findViewById(R.id.rvPendingRequests);
-        rvActive   = findViewById(R.id.rvActiveFriends);
+        rvSent                = findViewById(R.id.rvSentRequests);
+        rvReceived            = findViewById(R.id.rvPendingRequests);
+        rvActive              = findViewById(R.id.rvActiveFriends);
 
-        // Postavljanje LayoutManagera za RecyclerView-ove
         rvSent.setLayoutManager(new LinearLayoutManager(this));
         rvReceived.setLayoutManager(new LinearLayoutManager(this));
         rvActive.setLayoutManager(new LinearLayoutManager(this));
 
-        // Dugme za slanje zahteva iz Spinnera
         findViewById(R.id.btnSendRequest).setOnClickListener(v -> sendFriendRequest());
-
-        // 3. Učitavanje svih podataka
         loadAllData();
     }
-
     private void loadAllData() {
         loadAvailableUsers();
         loadSentRequests();
@@ -79,10 +79,10 @@ public class FriendsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     availableUsersList = response.body();
                     List<String> userNames = new ArrayList<>();
-                    userNames.add("Izaberi korisnika..."); // Placeholder
+                    userNames.add("Izaberi korisnika...");
 
                     for (User u : availableUsersList) {
-                        userNames.add(u.getUsername()); // Ili u.getName() zavisi od tvog User modela
+                        userNames.add(u.getUsername());
                     }
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(FriendsActivity.this,
@@ -91,7 +91,6 @@ public class FriendsActivity extends AppCompatActivity {
                     spinnerAvailableUsers.setAdapter(adapter);
                 }
             }
-
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Log.e("API_ERROR", "Greška Spinner: " + t.getMessage());
@@ -106,7 +105,6 @@ public class FriendsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     adapterSent = new FriendshipAdapter(response.body(), "SENT", (f, action) -> {
                         if (action.equals("CANCEL")) {
-                            // Koristimo ID reda iz baze
                             removeFriend(f.getId());
                         }
                     });
@@ -126,7 +124,6 @@ public class FriendsActivity extends AppCompatActivity {
                         if (action.equals("ACCEPT")) {
                             acceptFriendRequest(f.getId());
                         } else if (action.equals("REJECT")) {
-                            // Dodajemo i opciju za odbijanje
                             rejectFriendRequest(f.getId());
                         }
                     });
@@ -143,19 +140,15 @@ public class FriendsActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(FriendsActivity.this, "Zahtev prihvaćen!", Toast.LENGTH_SHORT).show();
-                    loadAllData(); // OSVEŽI SVE LISTE
+                    loadAllData();
                 }
             }
             @Override public void onFailure(Call<Void> call, Throwable t) {}
         });
     }
 
-    // Dodaj slične metode za loadActiveFriends() i loadAvailableUsers()...
-
     private void sendFriendRequest() {
         int selectedPos = spinnerAvailableUsers.getSelectedItemPosition();
-
-        // Proveravamo da li je izabran pravi korisnik (pozicija 0 je "Izaberi korisnika...")
         if (selectedPos > 0) {
             User selectedUser = availableUsersList.get(selectedPos - 1);
             long receiverId = selectedUser.getId();
@@ -165,7 +158,7 @@ public class FriendsActivity extends AppCompatActivity {
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(FriendsActivity.this, "Zahtev poslat!", Toast.LENGTH_SHORT).show();
-                        loadAllData(); // Osvežavamo sve liste da se vidi novi poslati zahtev
+                        loadAllData();
                     } else {
                         Toast.makeText(FriendsActivity.this, "Greška pri slanju", Toast.LENGTH_SHORT).show();
                     }
@@ -189,12 +182,11 @@ public class FriendsActivity extends AppCompatActivity {
                     List<Friendship> activeList = new ArrayList<>();
                     for (User u : response.body()) {
                         Friendship f = new Friendship();
-                        f.setUser1(u); // Za prikaz imena
+                        f.setUser1(u);
                         activeList.add(f);
                     }
                     adapterActive = new FriendshipAdapter(activeList, "ACTIVE", (f, action) -> {
                         if (action.equals("REMOVE")) {
-                            // Koristimo novu metodu koju smo kreirali u prethodnom koraku
                             removeFriendshipByUser(f.getUser1().getId());
                         }
                     });
@@ -216,7 +208,6 @@ public class FriendsActivity extends AppCompatActivity {
                     Toast.makeText(FriendsActivity.this, "Prijatelj uklonjen", Toast.LENGTH_SHORT).show();
                     loadAllData();
                 } else {
-                    Log.e("API_ERROR", "Kod greške: " + response.code());
                     Toast.makeText(FriendsActivity.this, "Greška: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -229,21 +220,17 @@ public class FriendsActivity extends AppCompatActivity {
     }
 
     private void removeFriend(long friendshipId) {
-        Log.d("API_POZIV", "Pokušavam brisanje zahteva sa ID: " + friendshipId);
-
         apiService.removeFriend(friendshipId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Log.d("API_SUCCESS", "Uspešno obrisano sa servera");
                     Toast.makeText(FriendsActivity.this, "Zahtev otkazan/obrisan", Toast.LENGTH_SHORT).show();
-                    loadAllData(); // Ovo mora da osveži listu
+                    loadAllData();
                 } else {
                     Log.e("API_ERROR", "Server vratio grešku: " + response.code());
                     Toast.makeText(FriendsActivity.this, "Greška servera: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("API_FAILURE", "Mreža ili Retrofit greška: " + t.getMessage());
@@ -263,5 +250,39 @@ public class FriendsActivity extends AppCompatActivity {
             }
             @Override public void onFailure(Call<Void> call, Throwable t) {}
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    //TODO: dopuniti akcije i proveriti celokupan meni
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_home) {
+            return true;
+        }  else if (id == R.id.nav_favorites) {
+            Intent intent = new Intent(FriendsActivity.this, FavoritesActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.nav_logout) {
+
+            SharedPreferences sp = getSharedPreferences("TravelAgencyApplication", MODE_PRIVATE);
+            sp.edit().remove("userId").apply();
+
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        } else if(id == R.id.nav_profile){
+            Intent intent = new Intent(FriendsActivity.this, UserPageActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
